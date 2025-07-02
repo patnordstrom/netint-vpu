@@ -1,0 +1,2 @@
+authorized_users     = ["yourusername"]
+allowed_ssh_user_ips = ["1.2.3.4/32"]

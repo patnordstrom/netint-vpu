@@ -1,0 +1,54 @@
+#cloud-config
+
+# Execute System Updates
+package_update: true
+package_upgrade: true
+
+# Install required packages
+packages:
+  - unzip
+  - nasm
+  - yasm
+  - pkg-config
+  - git
+  - gcc
+  - make
+  - nvme-cli
+  - g++
+
+# Setup NETINT Quadra software and install NETINT-ready ffmpeg
+runcmd:
+  - |
+    mkdir -p /scratch/artifacts
+    cd /scratch/artifacts
+    curl -o quadra.zip ${netint_quadra_sw_download_url}
+    unzip quadra.zip
+    echo "export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/" >> /etc/bashrc && echo "export LD_LIBRARY_PATH=/usr/local/lib/" >> /etc/bashrc && source /etc/bashrc
+    echo "/usr/local/lib" >> /etc/ld.so.conf && ldconfig
+    echo 'Defaults env_keep += "PKG_CONFIG_PATH"' >> /etc/sudoers
+    git clone -b n${ffmpeg_version} --depth=1 https://github.com/FFmpeg/FFmpeg.git FFmpeg
+
+    quadra_sw_dir="Quadra_V${netint_quadra_sw_version}/Quadra_SW_V${netint_quadra_sw_version}_RC3"
+    ffmpeg_patch_file="FFmpeg-n${ffmpeg_version}_netint_v${netint_quadra_sw_version}_RC3.diff"
+    cp -r ./$${quadra_sw_dir}/libxcoder ./
+
+    cd FFmpeg
+    cp ../$${quadra_sw_dir}/$${ffmpeg_patch_file} ./
+    patch -t -p 1 < $${ffmpeg_patch_file}
+
+    cd ../libxcoder
+    chmod +x build.sh
+    ./build.sh
+    ldconfig
+
+    cd ../FFmpeg
+    make clean
+    chmod +x build_ffmpeg.sh
+    ./build_ffmpeg.sh <<'EOF'
+    y
+    EOF
+    make install
+
+
+
+
