@@ -1,2 +1,2 @@
 # netint-vpu
-This repo will deploy a NETINT VPU instance and perform an installation of ffmpeg built with the custom NETINT libxcoder so that you can execute encoding on the VPU card
+This repo will deploy a NETINT VPU instance and perform an installation of ffmpeg built with the custom NETINT libxcoder so that you can execute encoding on the VPU card.  See companion article here:  https://patnordstrom.medium.com/getting-started-with-netint-vpu-accelerated-compute-instances-on-akamai-cloud-d8250bc1ac4b
